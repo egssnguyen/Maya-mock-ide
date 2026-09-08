@@ -49,8 +49,7 @@ print("Nodes trong scene:", cmds.ls())
             outputEl.className = "";
             outputEl.innerText = "Đang xử lý...";
 
-            // Thay đường dẫn bên dưới bằng URL Render của bạn
-            const BACKEND_URL = "https://maya-mock.onrender.com";
+            const BACKEND_URL = "https://maya-mock-backend.onrender.com/execute";
 
             try {
                 let response = await fetch(BACKEND_URL, {
