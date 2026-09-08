@@ -3,53 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maya Mobile Mock IDE</title>
-    <!-- CodeMirror CDN cho mobile-friendly editing -->
+    <title>Maya Cyber-HUD IDE</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/darcula.min.css">
     <style>
-        body { background: #1e1e1e; color: #fff; font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 15px; }
-        h2 { font-size: 18px; margin-bottom: 10px; color: #4CAF50; }
-        .CodeMirror { height: 50vh; border-radius: 8px; font-size: 14px; margin-bottom: 15px; }
-        button { background: #4CAF50; color: white; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer; }
-        button:active { background: #45a049; }
-        h3 { font-size: 14px; margin: 15px 0 5px 0; color: #aaa; }
-        pre { background: #2d2d2d; padding: 12px; border-radius: 8px; max-height: 25vh; overflow-y: auto; font-size: 13px; white-space: pre-wrap; }
-        .error { color: #ff5252; }
-        .success { color: #69f0ae; }
+        body {
+            background-color: #0b0f19;
+            color: #00f3ff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 15px;
+            border: 2px solid #ff007f;
+            box-shadow: inset 0 0 15px rgba(255, 0, 127, 0.3);
+            min-height: 95vh;
+        }
+        h2 {
+            text-align: center;
+            color: #ff007f;
+            text-shadow: 0 0 8px rgba(255, 0, 127, 0.6);
+            font-size: 18px;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+        .CodeMirror {
+            height: 42vh;
+            border: 1px solid #00f3ff;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        button, .file-upload-label {
+            background: transparent;
+            color: #00f3ff;
+            border: 1px solid #00f3ff;
+            padding: 10px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+            box-shadow: 0 0 5px rgba(0, 243, 255, 0.3);
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        button:active, button:hover, .file-upload-label:hover {
+            background: #00f3ff;
+            color: #0b0f19;
+            box-shadow: 0 0 15px #00f3ff;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .btn-export {
+            color: #ff007f;
+            border-color: #ff007f;
+            box-shadow: 0 0 5px rgba(255, 0, 127, 0.3);
+        }
+        .btn-export:hover {
+            background: #ff007f;
+            color: #fff;
+            box-shadow: 0 0 15px #ff007f;
+        }
+        h3 {
+            font-size: 12px;
+            color: #ff007f;
+            margin: 10px 0 5px 0;
+            text-transform: uppercase;
+        }
+        pre {
+            background: #05070d;
+            border: 1px solid #1a233a;
+            color: #00f3ff;
+            padding: 10px;
+            border-radius: 4px;
+            max-height: 20vh;
+            overflow-y: auto;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+        .error { color: #ff3366; text-shadow: 0 0 5px rgba(255, 51, 102, 0.4); }
+        .success { color: #00ffcc; text-shadow: 0 0 5px rgba(0, 255, 204, 0.4); }
     </style>
 </head>
 <body>
-    <h2>Maya Mock IDE (Mobile)</h2>
-    <textarea id="editor"># Thử nghiệm code Maya Mock
-cmds.spaceLocator(name="myTestLocator")
-print("Nodes trong scene:", cmds.ls())
-</textarea>
-    <button onclick="runCode()">Chạy thử (Run)</button>
+    <h2>[MAYA // CYBER-HUD v1.1]</h2>
     
-    <h3>Kết quả / Phân tích lỗi:</h3>
-    <pre id="output">Sẵn sàng...</pre>
+    <!-- Vùng chọn file để tải lên -->
+    <div class="btn-group">
+        <label class="file-upload-label" for="fileInput">📁 NẠP FILE (.PY / .MEL)</label>
+        <input type="file" id="fileInput" accept=".py,.mel,.txt" onchange="loadFromFile(event)">
+    </div>
+
+    <textarea id="editor"># Test code Maya Mock
+cmds.spaceLocator(name="sciFiLocator")
+print("Hệ thống khởi động thành công!")
+</textarea>
+
+    <div class="btn-group">
+        <button onclick="runCode()">CHẠY THỬ (RUN)</button>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-export" onclick="exportFile('py')">XUẤT .PY</button>
+        <button class="btn-export" onclick="exportFile('mel')">XUẤT .MEL</button>
+    </div>
+    
+    <h3>BẢNG ĐIỀU KHIỂN LOG / PHÂN TÍCH LỖI:</h3>
+    <pre id="output">Hệ thống sẵn sàng...</pre>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
     <script>
-        var editor = CodeMirror.fromTextArea(getElementByIdSafe("editor"), {
+        var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
             lineNumbers: true,
             mode: "python",
-            theme: "dracula",
+            theme: "darcula",
             indentUnit: 4,
             lineWrapping: true
         });
 
-        function getElementByIdSafe(id) { return document.getElementById(id); }
+        const BACKEND_URL = "https://maya-mock-backend.onrender.com/execute";
+
+        // Hàm đọc file upload từ thiết bị
+        function loadFromFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                editor.setValue(e.target.result);
+                document.getElementById("output").className = "success";
+                document.getElementById("output").innerText = `[Đã nạp file]: ${file.name}`;
+            };
+            reader.readAsText(file);
+        }
 
         async function runCode() {
             const code = editor.getValue();
             const outputEl = document.getElementById("output");
             outputEl.className = "";
-            outputEl.innerText = "Đang xử lý...";
-
-            const BACKEND_URL = "https://maya-mock-backend.onrender.com/execute";
+            outputEl.innerText = "Đang kết nối lượng tử...";
 
             try {
                 let response = await fetch(BACKEND_URL, {
@@ -61,15 +161,28 @@ print("Nodes trong scene:", cmds.ls())
                 
                 if (data.status === "success") {
                     outputEl.className = "success";
-                    outputEl.innerText = `[Thành công]\nScene Nodes: ${data.scene_nodes.join(', ')}\nSelection: ${data.selection}`;
+                    outputEl.innerText = `[THÀNH CÔNG]\nNodes: ${data.scene_nodes.join(', ')}\nSelection: ${data.selection}`;
                 } else {
                     outputEl.className = "error";
-                    outputEl.innerText = `[Lỗi ở dòng ${data.line}] ${data.error_type}: ${data.message}\n\nTraceback:\n${data.traceback}`;
+                    outputEl.innerText = `[LỖI DÒNG ${data.line}] ${data.error_type}: ${data.message}\n\nTraceback:\n${data.traceback}`;
                 }
             } catch (err) {
                 outputEl.className = "error";
-                outputEl.innerText = "Không thể kết nối đến Backend Render: " + err.message;
+                outputEl.innerText = "Lỗi kết nối Backend: " + err.message;
             }
+        }
+
+        function exportFile(ext) {
+            const code = editor.getValue();
+            const blob = new Blob([code], { type: "text/plain;charset=utf-8"	});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `maya_script_${Date.now()}.${ext}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
     </script>
 </body>
