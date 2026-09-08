@@ -5,6 +5,7 @@ import traceback
 
 app = FastAPI(title="Maya Mock API")
 
+# Cho phép mọi nguồn (Frontend trên điện thoại) gọi vào API
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
