@@ -5,10 +5,9 @@ import traceback
 
 app = FastAPI(title="Maya Mock API")
 
-# Cấu hình CORS để cho phép Frontend từ GitHub truy cập vào
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Có thể thay dấu * bằng domain GitHub Pages của bạn sau
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -50,7 +49,6 @@ class MayaMockEnvironment:
             return list(self.selection)
         return list(self.nodes.keys())
 
-# Instance cmds giả lập toàn cục
 cmds = MayaMockEnvironment()
 
 class CodeRequest(BaseModel):
@@ -58,7 +56,6 @@ class CodeRequest(BaseModel):
 
 @app.post("/execute")
 async def execute_code(req: CodeRequest):
-    # Reset lại môi trường nhẹ nếu cần hoặc giữ state tùy bạn
     local_env = {"cmds": cmds}
     global_env = {}
     
