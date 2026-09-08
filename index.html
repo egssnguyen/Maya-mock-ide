@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maya Mobile Mock IDE</title>
+    <!-- CodeMirror CDN cho mobile-friendly editing -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+    <style>
+        body { background: #1e1e1e; color: #fff; font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 15px; }
+        h2 { font-size: 18px; margin-bottom: 10px; color: #4CAF50; }
+        .CodeMirror { height: 50vh; border-radius: 8px; font-size: 14px; margin-bottom: 15px; }
+        button { background: #4CAF50; color: white; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 8px; width: 100%; cursor: pointer; }
+        button:active { background: #45a049; }
+        h3 { font-size: 14px; margin: 15px 0 5px 0; color: #aaa; }
+        pre { background: #2d2d2d; padding: 12px; border-radius: 8px; max-height: 25vh; overflow-y: auto; font-size: 13px; white-space: pre-wrap; }
+        .error { color: #ff5252; }
+        .success { color: #69f0ae; }
+    </style>
+</head>
+<body>
+    <h2>Maya Mock IDE (Mobile)</h2>
+    <textarea id="editor"># Thử nghiệm code Maya Mock
+cmds.spaceLocator(name="myTestLocator")
+print("Nodes trong scene:", cmds.ls())
+</textarea>
+    <button onclick="runCode()">Chạy thử (Run)</button>
+    
+    <h3>Kết quả / Phân tích lỗi:</h3>
+    <pre id="output">Sẵn sàng...</pre>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+    <script>
+        var editor = CodeMirror.fromTextArea(getElementByIdSafe("editor"), {
+            lineNumbers: true,
+            mode: "python",
+            theme: "dracula",
+            indentUnit: 4,
+            lineWrapping: true
+        });
+
+        function getElementByIdSafe(id) { return document.getElementById(id); }
+
+        async function runCode() {
+            const code = editor.getValue();
+            const outputEl = document.getElementById("output");
+            outputEl.className = "";
+            outputEl.innerText = "Đang xử lý...";
+
+            // Thay đường dẫn bên dưới bằng URL Render của bạn
+            const BACKEND_URL = "https://TEN-UNG-DUNG-CUA-BAN.onrender.com/execute";
+
+            try {
+                let response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code })
+                });
+                let data = await response.json();
+                
+                if (data.status === "success") {
+                    outputEl.className = "success";
+                    outputEl.innerText = `[Thành công]\nScene Nodes: ${data.scene_nodes.join(', ')}\nSelection: ${data.selection}`;
+                } else {
+                    outputEl.className = "error";
+                    outputEl.innerText = `[Lỗi ở dòng ${data.line}] ${data.error_type}: ${data.message}\n\nTraceback:\n${data.traceback}`;
+                }
+            } catch (err) {
+                outputEl.className = "error";
+                outputEl.innerText = "Không thể kết nối đến Backend Render: " + err.message;
+            }
+        }
+    </script>
+</body>
+</html>
